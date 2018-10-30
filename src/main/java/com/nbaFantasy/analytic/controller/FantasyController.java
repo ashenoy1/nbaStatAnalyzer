@@ -21,6 +21,7 @@ public class FantasyController {
     @RequestMapping(value="dailyLeader",method = RequestMethod.GET)
     public ResponseEntity<String> dailyLeader() throws Exception{
         service.getCurrentGameIds();
+        service.loadPlayerData();
         return service.getTodaysGames();
     }
 

@@ -10,10 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class FantasyService {
+
+    private Map<String,String> playerById;
 
 
     public ResponseEntity getTodaysGames(){
@@ -21,6 +25,14 @@ public class FantasyService {
         String fooResourceUrl = "http://data.nba.net/10s/prod/v2/20181029/scoreboard.json";
         ResponseEntity<String> response
                 = restTemplate.getForEntity(fooResourceUrl, String.class);
+        return response;
+    }
+
+    public ResponseEntity<String> getBoxScore(String gameId){
+        String url =  "http://data.nba.net/10s/prod/v1/20181029/" + gameId + "_boxscore.json";
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response
+                = restTemplate.getForEntity(url, String.class);
         return response;
     }
 
@@ -39,7 +51,41 @@ public class FantasyService {
 
     //Get the list of gameIDs and run against that VVV api and grab the best stats
 
-    public
+    public void getStats() throws Exception{
+        List<String> gameIds = getCurrentGameIds();
+        ObjectMapper mapper = new ObjectMapper();
+        for(String temp: gameIds)
+        {
+            ResponseEntity<String> response = getBoxScore(temp);
+            JsonNode root = mapper.readTree(response.getBody());
+            JsonNode stats = root.path("stats");
+            JsonNode activePlayers = stats.path("activePlayers");
+            for(JsonNode iter: activePlayers){
+                //Player player = mapper.treeToValue(temp, Player.class);
+                //NEED TO GET ALL PLAYER ID
+            }
+
+
+        }
+    }
+
+    public void loadPlayerData() throws Exception{
+        this.playerById = new HashMap<>();
+        String url = "http://data.nba.net/10s/prod/v1/2016/players.json";
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response
+                = restTemplate.getForEntity(url, String.class);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(response.getBody());
+        JsonNode player = root.get("league").get("standard");
+        for(JsonNode temp: player){
+            String name = temp.get("firstName").asText() + " " + temp.get("lastName").asText();
+            String playerId = temp.get("personId").asText();
+            playerById.putIfAbsent(playerId,name);
+            System.out.println(name);
+        }
+
+    }
 
 
 
