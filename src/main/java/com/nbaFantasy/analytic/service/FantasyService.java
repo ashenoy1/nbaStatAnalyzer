@@ -20,6 +20,7 @@ public class FantasyService {
     private Map<String,String> playerById;
 
 
+    //Gets the gameID of everything played today (HARDCODED FOR 10/29)
     public ResponseEntity getTodaysGames(){
         RestTemplate restTemplate = new RestTemplate();
         String fooResourceUrl = "http://data.nba.net/10s/prod/v2/20181029/scoreboard.json";
@@ -28,6 +29,7 @@ public class FantasyService {
         return response;
     }
 
+    //GET BOXSCORE OF SELECT GAME
     public ResponseEntity<String> getBoxScore(String gameId){
         String url =  "http://data.nba.net/10s/prod/v1/20181029/" + gameId + "_boxscore.json";
         RestTemplate restTemplate = new RestTemplate();
@@ -49,11 +51,14 @@ public class FantasyService {
         return gamesIds;
     }
 
+
+    //"gameId":"0021800091" (Chi VS GSW) 10/29/2018    KD- 201142
     //Get the list of gameIDs and run against that VVV api and grab the best stats
 
     public void getStats() throws Exception{
         List<String> gameIds = getCurrentGameIds();
         ObjectMapper mapper = new ObjectMapper();
+        List<Player> allPlayers = new ArrayList<>();
         for(String temp: gameIds)
         {
             ResponseEntity<String> response = getBoxScore(temp);
@@ -61,7 +66,9 @@ public class FantasyService {
             JsonNode stats = root.path("stats");
             JsonNode activePlayers = stats.path("activePlayers");
             for(JsonNode iter: activePlayers){
-                //Player player = mapper.treeToValue(temp, Player.class);
+                Player player = mapper.treeToValue(temp, Player.class);
+                player.getFantasyScore();
+                allPlayers(player);
                 //NEED TO GET ALL PLAYER ID
             }
 
