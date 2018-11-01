@@ -1,5 +1,7 @@
 package com.nbaFantasy.analytic.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Player {
     public String getPersonId() {
         return personId;
@@ -200,7 +202,10 @@ public class Player {
     private double totalFpts;
     private String personId;
     private String teamId;
+
+    @JsonProperty("isOnCourt")
     private boolean isOnCourt;
+
     private String points;
     private String pos;
     private String min;
@@ -254,4 +259,8 @@ public class Player {
 
 
     }
+
+
+
+
 }

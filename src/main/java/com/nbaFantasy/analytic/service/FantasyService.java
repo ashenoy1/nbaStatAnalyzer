@@ -1,6 +1,7 @@
 package com.nbaFantasy.analytic.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nbaFantasy.analytic.entity.DisplayPlayer;
 import com.nbaFantasy.analytic.entity.Player;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +22,7 @@ public class FantasyService {
     //Gets the gameID of everything played today (HARDCODED FOR 10/29)
     public ResponseEntity getTodaysGames(){
         RestTemplate restTemplate = new RestTemplate();
-        String fooResourceUrl = "http://data.nba.net/10s/prod/v2/20181029/scoreboard.json";
+        String fooResourceUrl = "http://data.nba.net/10s/prod/v2/20181031/scoreboard.json";
         ResponseEntity<String> response
                 = restTemplate.getForEntity(fooResourceUrl, String.class);
         return response;
@@ -29,7 +30,7 @@ public class FantasyService {
 
     //GET BOXSCORE OF SELECT GAME
     public ResponseEntity<String> getBoxScore(String gameId){
-        String url =  "http://data.nba.net/10s/prod/v1/20181029/" + gameId + "_boxscore.json";
+        String url =  "http://data.nba.net/10s/prod/v1/20181031/" + gameId + "_boxscore.json";
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response
                 = restTemplate.getForEntity(url, String.class);
@@ -53,10 +54,10 @@ public class FantasyService {
     //"gameId":"0021800091" (Chi VS GSW) 10/29/2018    KD- 201142
     //Get the list of gameIDs and run against that VVV api and grab the best stats
 
-    public void getStats() throws Exception{
+    public List<DisplayPlayer> getStats() throws Exception{
         List<String> gameIds = getCurrentGameIds();
         ObjectMapper mapper = new ObjectMapper();
-        List<Player> allPlayers = new ArrayList<>();
+        List<DisplayPlayer> allPlayers = new ArrayList<>();
         for(String temp: gameIds)
         {
             ResponseEntity<String> response = getBoxScore(temp);
@@ -66,13 +67,13 @@ public class FantasyService {
             for(JsonNode iter: activePlayers){
                 Player player = mapper.treeToValue(iter, Player.class);
                 player.getFantasyScore();
-                allPlayers.add(player);
+                String name = playerById.get(player.getPersonId());
+                DisplayPlayer displayPlayer = new DisplayPlayer(name,player.getTotalFpts());
+                allPlayers.add(displayPlayer);
             }
-            Collections.sort(allPlayers, (Player p1, Player p2) -> p1.getTotalFpts()-p2.getTotalFpts());
-
-
-
         }
+        Collections.sort(allPlayers);
+        return allPlayers;
     }
 
     public void loadPlayerData() throws Exception{
