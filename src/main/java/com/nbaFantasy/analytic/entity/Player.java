@@ -193,6 +193,11 @@ public class Player {
         this.plusMinus = plusMinus;
     }
 
+    public double getTotalFpts() {
+        return totalFpts;
+    }
+
+    private double totalFpts;
     private String personId;
     private String teamId;
     private boolean isOnCourt;
@@ -218,19 +223,35 @@ public class Player {
     private String blocks;
     private String plusMinus;
 
-    public float getFANTASYSCORE() {
-       float fieldGoal = Float.parsefloat(this.fgm);
-       float threePtr = Float.parsefloat(this.tpm);
-       float rebounds = Float.parsefloat(this.totReb) * 1.5;
-       float assistsPts = Float.parsefloat(this.assists) * 1.5;
-       float stealsPts = Float.parsefloat(this.seals) * 2.0;
-       float blockPts = Float.parsefloat(this.blocks) * 2.0;
-       float turnoverPts = Float.parsefloat(this.turnovers) * -1.0;
-       float totalFpts = fieldGoal + threePtr + rebounds + assistsPts + stealsPts + blockPts + turnoverPts;
+    public void getFantasyScore() {
+        double fieldGoal = Double.parseDouble(this.fgm);
+        double threePtr = Double.parseDouble(this.tpm);
+        double rebounds = Double.parseDouble(this.totReb) * 1.5;
+        double assistsPts = Double.parseDouble(this.assists) * 1.5;
+        double stealsPts = Double.parseDouble(this.steals) * 2.0;
+        double blockPts = Double.parseDouble(this.blocks) * 2.0;
+        double turnoverPts = Double.parseDouble(this.turnovers) * -1.0;
+        double regPoints = Double.parseDouble(this.points);
+        this.totalFpts = fieldGoal + threePtr + rebounds + assistsPts + stealsPts + blockPts + turnoverPts + regPoints;
+        int isTripleDouble = 0;
 
+        //Double Double/ Triple Double
+        if (Double.parseDouble(this.assists) >= 10.0)
+            isTripleDouble++;
+        if (Double.parseDouble(this.points) >= 10.0)
+            isTripleDouble++;
+        if (Double.parseDouble(this.totReb) >= 10.0)
+            isTripleDouble++;
+        if (Double.parseDouble(this.steals) >= 10.0)
+            isTripleDouble++;
+        if (Double.parseDouble(this.blocks) >= 10.0)
+            isTripleDouble++;
 
-       //NEED TO FIGURE THIS OUT
-       if(Float.parsefloat(this.assists) >= 10 && Float.parsefloat(this.assists) >= 10 && Float.parsefloat(this.assists) >= 10)
+        if (isTripleDouble >= 2)
+            this.totalFpts++;
+        if (isTripleDouble >= 3)
+            this.totalFpts = totalFpts + 5;
+
 
     }
 }

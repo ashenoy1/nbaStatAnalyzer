@@ -1,6 +1,7 @@
 package com.nbaFantasy.analytic.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nbaFantasy.analytic.entity.Player;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -9,10 +10,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FantasyService {
@@ -66,11 +64,12 @@ public class FantasyService {
             JsonNode stats = root.path("stats");
             JsonNode activePlayers = stats.path("activePlayers");
             for(JsonNode iter: activePlayers){
-                Player player = mapper.treeToValue(temp, Player.class);
+                Player player = mapper.treeToValue(iter, Player.class);
                 player.getFantasyScore();
-                allPlayers(player);
-                //NEED TO GET ALL PLAYER ID
+                allPlayers.add(player);
             }
+            Collections.sort(allPlayers, (Player p1, Player p2) -> p1.getTotalFpts()-p2.getTotalFpts());
+
 
 
         }
